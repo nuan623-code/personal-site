@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watchlist 全面分析</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #08080d; color: #ddd; line-height: 1.6; }
+
+.header { background: linear-gradient(135deg, #0d0820 0%, #081020 100%); padding: 28px 24px 20px; border-bottom: 1px solid #1e1e35; }
+.header h1 { font-size: 1.3rem; color: #fff; font-weight: 700; }
+.header p { font-size: 0.8rem; color: #555; margin-top: 5px; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 20px 16px; }
+
+.warn { background: #140c00; border: 1px solid #553300; border-radius: 8px; padding: 10px 14px; font-size: 0.78rem; color: #cc9922; margin-bottom: 20px; }
+
+/* Overview table */
+.overview { background: #111119; border: 1px solid #222230; border-radius: 12px; padding: 16px; margin-bottom: 20px; overflow-x: auto; }
+.ov-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #555; margin-bottom: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+th { text-align: left; padding: 8px 10px; color: #555; font-weight: 500; border-bottom: 1px solid #1e1e30; font-size: 0.68rem; text-transform: uppercase; white-space: nowrap; }
+td { padding: 9px 10px; border-bottom: 1px solid #141420; color: #bbb; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #0f0f18; }
+.g { color: #4ade80; } .r { color: #f87171; } .y { color: #fbbf24; }
+.ticker-cell { font-weight: 700; font-size: 0.88rem; }
+
+/* Section */
+.section-title { font-size: 0.95rem; font-weight: 700; color: #fff; margin: 24px 0 12px; padding-bottom: 7px; border-bottom: 1px solid #1e1e30; }
+
+/* Cards grid */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+@media(max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+
+.card { background: #111119; border: 1px solid #1e1e2e; border-radius: 11px; padding: 16px; }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.cticker { font-size: 1.2rem; font-weight: 800; }
+.cname { font-size: 0.7rem; color: #666; margin-top: 2px; }
+.cprice { text-align: right; }
+.cpval { font-size: 1rem; font-weight: 600; color: #fff; }
+.cpchange { font-size: 0.72rem; margin-top: 2px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tag { padding: 2px 7px; border-radius: 10px; font-size: 0.66rem; font-weight: 600; }
+.tg { background: #041a08; color: #4ade80; border: 1px solid #0a4; }
+.tr { background: #1a0404; color: #f87171; border: 1px solid #600; }
+.ty { background: #1a1200; color: #fbbf24; border: 1px solid #553300; }
+.tb { background: #000d1a; color: #60a5fa; border: 1px solid #003; }
+.tp { background: #0e0018; color: #c084fc; border: 1px solid #330066; }
+
+.desc { font-size: 0.8rem; color: #aaa; margin-bottom: 10px; line-height: 1.5; }
+
+.brow { display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.78rem; }
+.bdot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.dg { background: #4ade80; } .dr { background: #f87171; } .dy { background: #fbbf24; }
+
+.verdict { margin-top: 10px; padding: 8px 10px; border-radius: 6px; font-size: 0.77rem; }
+.v-strong { background: #031a08; border-left: 3px solid #4ade80; color: #9ae6b4; }
+.v-watch { background: #1a1200; border-left: 3px solid #fbbf24; color: #fde68a; }
+.v-caution { background: #1a0808; border-left: 3px solid #f87171; color: #fca5a5; }
+.v-speculative { background: #0e0018; border-left: 3px solid #c084fc; color: #e9d5ff; }
+
+.bar-row { margin-bottom: 7px; }
+.bl { display: flex; justify-content: space-between; font-size: 0.72rem; color: #888; margin-bottom: 3px; }
+.bt { background: #1a1a28; border-radius: 3px; height: 5px; overflow: hidden; }
+.bf { height: 100%; border-radius: 3px; }
+
+.juglar-box { background: #0a0a15; border: 1px solid #1e1e35; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 0.76rem; color: #8888bb; }
+.juglar-box b { color: #a0a0ee; }
+
+footer { text-align: center; font-size: 0.68rem; color: #2a2a2a; padding: 20px; border-top: 1px solid #111; margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 Watchlist 完整分析 · 15只股票</h1>
+  <p>数据截至 2026年6月1日 · 不构成投资建议</p>
+</div>
+
+<div class="container">
+<div class="warn">⚠️ 仅供参考，不构成投资建议。所有数据来源公开信息，可能存在滞后。</div>
+
+<!-- OVERVIEW TABLE -->
+<div class="overview">
+  <div class="ov-title">快速总览</div>
+  <table>
+    <tr>
+      <th>代码</th><th>公司</th><th>当日价格</th><th>当日涨跌</th><th>主题</th><th>盈利</th><th>风险</th><th>朱格拉位置</th>
+    </tr>
+    <tr><td class="ticker-cell y">NOK</td><td>诺基亚</td><td>$16.30</td><td class="g">+9.84%</td><td>AI网络基建</td><td class="g">✅盈利</td><td class="g">低</td><td>扩张加速期</td></tr>
+    <tr><td class="ticker-cell r">SIVEF</td><td>Sivers半导体</td><td>$6.65</td><td class="r">-9.28%</td><td>CPO激光光源</td><td class="r">❌亏损</td><td class="r">极高</td><td>新周期极早期</td></tr>
+    <tr><td class="ticker-cell g">AAOI</td><td>Applied Opto</td><td>$186.00</td><td class="g">+17.42%</td><td>AI光模块</td><td class="r">❌亏损</td><td class="r">极高</td><td>扩张期但过热</td></tr>
+    <tr><td class="ticker-cell y">BB</td><td>BlackBerry</td><td>$9.99</td><td class="g">+11.00%</td><td>Physical AI OS</td><td class="g">✅盈利</td><td class="g">中低</td><td>复苏期+新周期叠加</td></tr>
+    <tr><td class="ticker-cell r">NVTS</td><td>Navitas半导体</td><td>$24.70</td><td class="r">-7.14%</td><td>GaN/SiC电源</td><td class="r">❌亏损</td><td class="r">高</td><td>新周期早期</td></tr>
+    <tr><td class="ticker-cell p" style="color:#c084fc">INFQ</td><td>Infleqtion</td><td>$17.95</td><td class="g">+10.67%</td><td>量子计算/传感</td><td class="r">❌亏损</td><td class="r">极高</td><td>周期前 (pre-cycle)</td></tr>
+    <tr><td class="ticker-cell">QQQ</td><td>Invesco QQQ</td><td>$740.28</td><td class="g">+0.27%</td><td>纳斯达克100 ETF</td><td class="g">N/A</td><td class="g">低</td><td>扩张中期</td></tr>
+    <tr><td class="ticker-cell g">VPG</td><td>Vishay精密</td><td>$126.86</td><td class="g">+1.24%</td><td>精密传感/机器人</td><td class="y">接近盈利</td><td class="y">中</td><td>复苏期</td></tr>
+    <tr><td class="ticker-cell g">DRAM</td><td>Roundhill内存ETF</td><td>$68.38</td><td class="g">+8.20%</td><td>HBM/DRAM ETF</td><td>N/A</td><td class="y">中高</td><td>超级周期中期</td></tr>
+    <tr><td class="ticker-cell r">SHSNF</td><td>顺新科技</td><td>$14.09</td><td class="r">-22.36%</td><td>SiP封装测试</td><td class="r">低利润率</td><td class="r">高</td><td>波动期</td></tr>
+    <tr><td class="ticker-cell r">ASTS</td><td>AST SpaceMobile</td><td>$104.69</td><td class="r">-7.69%</td><td>卫星直连手机</td><td class="r">❌亏损</td><td class="r">极高</td><td>新周期早期</td></tr>
+    <tr><td class="ticker-cell r">RKLB</td><td>Rocket Lab</td><td>$122.17</td><td class="r">-14.85%</td><td>小型火箭/太空系统</td><td class="r">❌亏损</td><td class="r">高</td><td>扩张加速期</td></tr>
+    <tr><td class="ticker-cell g">NBIS</td><td>Nebius Group</td><td>$267.46</td><td class="g">+15.74%</td><td>AI云基建</td><td class="y">接近盈利</td><td class="r">高</td><td>扩张加速期</td></tr>
+    <tr><td class="ticker-cell r">HOOD</td><td>Robinhood</td><td>$90.24</td><td class="r">-4.31%</td><td>零售券商/加密</td><td class="g">✅盈利</td><td class="y">中高</td><td>扩张期</td></tr>
+    <tr><td class="ticker-cell g">BE</td><td>Bloom Energy</td><td>$274.20</td><td class="r">-3.79%</td><td>AI数据中心供电</td><td class="y">转盈利</td><td class="y">中高</td><td>扩张加速期</td></tr>
+    <tr><td class="ticker-cell g">NOW</td><td>ServiceNow</td><td>$131.99</td><td class="g">+6.13%</td><td>企业AI平台</td><td class="g">✅盈利</td><td class="g">低中</td><td>扩张成熟期</td></tr>
+  </table>
+</div>
+
+<!-- SECTOR 1: 核心AI基建 -->
+<div class="section-title">🔴 第一组：AI基础设施核心（你的主线）</div>
+<div class="grid">
+
+  <!-- NOK -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#60a5fa">NOK</div><div class="cname">Nokia Corp · NYSE ADR</div></div>
+      <div class="cprice"><div class="cpval">$16.30</div><div class="cpchange g">+9.84% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tg">✅已盈利</span><span class="tag tb">光网络</span><span class="tag tb">AI-RAN</span><span class="tag tg">年内+140%</span></div>
+    <div class="desc">诺基亚已彻底转型为AI网络基础设施公司。Q1 2026 AI&云客户收入同比增长49%，光网络增长20%，单季拿下10亿欧元AI订单，将全年网络基建指引上调至12-14%增长。收购Infinera让它在AI数据中心光互联领域有真实布局。</div>
+    <div class="bar-row"><div class="bl"><span>AI&云收入增速</span><span class="g">+49% YoY</span></div><div class="bt"><div class="bf" style="width:75%;background:#60a5fa"></div></div></div>
+    <div class="bar-row"><div class="bl"><span>光网络增速</span><span class="g">+20% YoY</span></div><div class="bt"><div class="bf" style="width:55%;background:#60a5fa"></div></div></div>
+    <div class="brow"><div class="bdot dg"></div><span>账面现金38亿欧元，资产负债表健康</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>book-to-bill>1，未来收入可见度强</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>AI收入仅占总营收8%，转型仍在早期</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>移动网络业务增速慢，拖累整体</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>扩张加速期。AI数据中心建设驱动光网络资本支出大幅提升，Nokia的订单backlog已锁定12-18个月收入。今日大涨9.84%说明市场正在重新定价其AI属性。</div>
+    <div class="verdict v-strong">✅ 综合评价：相对低风险的AI基建标的。已盈利、估值合理、护城河真实。适合$5万组合中的"稳定仓"。</div>
+  </div>
+
+  <!-- NBIS -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#c084fc">NBIS</div><div class="cname">Nebius Group · Nasdaq</div></div>
+      <div class="cprice"><div class="cpval">$267.46</div><div class="cpchange g">+15.74% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag ty">⚠️接近盈利</span><span class="tag tp">AI云算力</span><span class="tag tr">年内+560%</span></div>
+    <div class="desc">前Yandex团队打造的AI云平台，Q1营收同比增长684%。与BE签了$26亿供电协议，芬兰建欧洲最大AI数据中心310MW。分析师共识目标价~$230，当前$267已超目标价。</div>
+    <div class="brow"><div class="bdot dg"></div><span>Q1收入增速684%，成长性极强</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>与Meta/微软/英伟达有大额合同</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>PE 68x，已超所有分析师目标价</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>与AWS/Azure直接竞争，对手极强</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>AI资本投资周期扩张加速期的直接受益者，但估值已大量透支。</div>
+    <div class="verdict v-caution">⚠️ 综合评价：逻辑强但估值贵。今日+15%后更贵。适合已持有者拿，追高需谨慎。</div>
+  </div>
+
+  <!-- BE -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#4ade80">BE</div><div class="cname">Bloom Energy · NYSE</div></div>
+      <div class="cprice"><div class="cpval">$274.20</div><div class="cpchange r">-3.79% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag ty">转盈利中</span><span class="tag tg">AI供电</span><span class="tag tg">长约锁定</span><span class="tag tr">年内+1400%</span></div>
+    <div class="desc">燃料电池为AI数据中心提供清洁稳定电力，解决电网容量瓶颈。已签NBIS $26亿+Oracle $28亿长期合约，收入能见度极强。2026年预估净利润$4.75亿，2028年$21亿。</div>
+    <div class="brow"><div class="bdot dg"></div><span>10年长约=极强收入可见度</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>AI数据中心电力需求是真实结构性需求</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>今年已涨14倍，Citi认为"充分定价"</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>AI数据中心能源基建是新的朱格拉投资周期，BE是最直接的受益者之一，但涨幅已透支大部分未来。</div>
+    <div class="verdict v-watch">👁️ 综合评价：商业模式极好，但+1400%后追高风险大。等回调机会。</div>
+  </div>
+
+  <!-- AAOI -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#f87171">AAOI</div><div class="cname">Applied Optoelectronics · Nasdaq</div></div>
+      <div class="cprice"><div class="cpval">$186.00</div><div class="cpchange g">+17.42% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tr">❌亏损</span><span class="tag tb">800G光模块</span><span class="tag tr">年内+900%+</span></div>
+    <div class="desc">为AI数据中心提供800G/1.6T高速光模块，是GPU集群的"光纤血管"。2026年收入指引超$11亿，同比翻倍以上。但前3客户占91%营收，内部人士近期大量减持。</div>
+    <div class="brow"><div class="bdot dg"></div><span>800G已向大型超大规模云厂商出货</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>客户集中度极高，竞争对手体量更大</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>今日+17%后估值更透支，内部人减持</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>AI光互联扩张期，但股价已大量透支。今日+17%是追高信号而非入场信号。</div>
+    <div class="verdict v-caution">🚨 综合评价：今日大涨后风险极高。已持有者需考虑减仓，新资金追高谨慎。</div>
+  </div>
+
+</div>
+
+<!-- SECTOR 2: Physical AI -->
+<div class="section-title">🟡 第二组：Physical AI 基础层</div>
+<div class="grid">
+
+  <!-- BB -->
+  <div class="card" style="border-color:#fbbf2444">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#fbbf24">BB ⭐</div><div class="cname">BlackBerry · NYSE/TSX</div></div>
+      <div class="cprice"><div class="cpval">$9.99</div><div class="cpchange g">+11.00% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tg">✅已盈利</span><span class="tag ty">Physical AI OS</span><span class="tag tg">护城河最深</span><span class="tag tg">年内+120%</span></div>
+    <div class="desc">QNX实时操作系统嵌入2.75亿辆汽车，正扩展至机器人/工业AI。与英伟达深度合作Physical AI安全栈。版税积压$9.5亿，FY26 GAAP净利润$5320万，连续8季度改善。</div>
+    <div class="brow"><div class="bdot dg"></div><span>唯一可直接投资的纯RTOS上市公司</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>两条护城河叠加，估值在5只中最合理</span></div>
+    <div class="brow"><div class="bdot dy"></div><span>近两周已涨46%，分析师目标价仍在$5左右</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>汽车周期复苏中段 + Physical AI新周期早期，双重叠加。版税模式意味着随着搭载QNX的新车进入市场，版税收入持续增长，是典型的朱格拉周期复利受益者。</div>
+    <div class="verdict v-strong">✅ 综合评价：watchlist里基本面最扎实的标的之一。长期逻辑清晰，适合作为核心仓位。</div>
+  </div>
+
+  <!-- VPG -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#4ade80">VPG</div><div class="cname">Vishay Precision Group · NYSE</div></div>
+      <div class="cprice"><div class="cpval">$126.86</div><div class="cpchange g">+1.24% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag ty">接近盈利</span><span class="tag tg">精密传感</span><span class="tag tb">机器人传感器</span></div>
+    <div class="desc">精密传感、称重、测量技术公司。Q1 2026营收同比+17.6%创新高，订单突破$1亿，book-to-bill 1.21。重要亮点：已与第四家人形机器人开发商展开工程讨论，目标Physical AI传感器市场。</div>
+    <div class="brow"><div class="bdot dg"></div><span>机器人传感器订单刚开始：$1M首季订单，4家人形机器人客户</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>防务/半导体设备/数据中心多线增长</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>利润率仍薄，EBITDA margin仅7%</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>机器人收入占比极小，故事多于现实</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>工业传感周期复苏期，机器人是叠加的新增长，但还很早期。和BB一样，是Physical AI "感知层"的实物传感器供应商。</div>
+    <div class="verdict v-watch">👁️ 综合评价：值得关注的低调标的。机器人传感器如果放量，会是一个惊喜。当前估值不贵，但需要耐心。</div>
+  </div>
+
+  <!-- NVTS -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#f87171">NVTS</div><div class="cname">Navitas Semiconductor · Nasdaq</div></div>
+      <div class="cprice"><div class="cpval">$24.70</div><div class="cpchange r">-7.14% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tr">❌亏损</span><span class="tag tb">GaN/SiC电源</span><span class="tag ty">英伟达合作</span></div>
+    <div class="desc">GaN+SiC下一代电源半导体，是英伟达800V DC AI工厂架构的指定电源合作伙伴。Q1 2026营收$860万，同比+18%，但仍亏损$3380万。正在从消费充电转向AI数据中心高功率电源。</div>
+    <div class="brow"><div class="bdot dg"></div><span>AI基建电源收入Q1环比增长50%</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>GaN+SiC双产品线，是竞争对手没有的优势</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>Q1收入仅$860万，亏损$3380万——比例悬殊</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>5月再次增发股份融资，持续稀释</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>PS 61x，远高于行业平均8.7x</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>AI数据中心电源升级是真实的新朱格拉周期投资需求，但NVTS的收入实质量产至少要到2027年，当前估值透支严重。</div>
+    <div class="verdict v-caution">⚠️ 综合评价：技术故事真实，但收入太小、亏损太大、持续稀释。需要等收入拐点确认再考虑。</div>
+  </div>
+
+  <!-- SIVEF -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#f87171">SIVEF</div><div class="cname">Sivers Semiconductor · OTC</div></div>
+      <div class="cprice"><div class="cpval">$6.65</div><div class="cpchange r">-9.28% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tr">❌亏损</span><span class="tag tb">InP激光光源</span><span class="tag tr">年内+2100%</span><span class="tag ty">CPO卡脖子</span></div>
+    <div class="desc">InP激光器供应商，为CPO提供外部光源。6个月涨2100%，但收入仅$3200万，市值$25亿，P/S约80x。Q1收入环比下降22%（客户认证延误），但管道增长77%至$5.3亿。</div>
+    <div class="brow"><div class="bdot dg"></div><span>InP晶圆良率低于30%，天然稀缺壁垒</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>客户：Ayar Labs/POET/Jabil/英伟达LiDAR生态</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>P/S 80x，估值极度透支</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>Q1收入下降，量产时间线不确定</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>CPO商业化新周期的最早期，正确的故事但大量提前定价。回调-9%只是正常波动，估值修复可能还远。</div>
+    <div class="verdict v-caution">🚨 综合评价：+2100%后P/S 80x，今天-9%只是开始。逻辑正确但估值极度透支，不是现在入场的时机。</div>
+  </div>
+
+</div>
+
+<!-- SECTOR 3: 太空/国防 -->
+<div class="section-title">🔵 第三组：太空、国防、量子</div>
+<div class="grid">
+
+  <!-- RKLB -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#60a5fa">RKLB</div><div class="cname">Rocket Lab · Nasdaq</div></div>
+      <div class="cprice"><div class="cpval">$122.17</div><div class="cpchange r">-14.85% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tr">❌亏损</span><span class="tag tb">小型火箭</span><span class="tag tb">太空系统</span><span class="tag ty">Neutron开发中</span></div>
+    <div class="desc">全球最活跃的小型轨道火箭公司。Q1 2026营收$2003万（同比+63.5%），创历史新高，积压订单$22亿（同比+108%）。Q2指引$2325万中值，再创纪录。Neutron中型火箭首次发射目标Q4 2026。</div>
+    <div class="brow"><div class="bdot dg"></div><span>已签Golden Dome/Anduril/Raytheon国防合同</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>$22亿积压订单，36%在12个月内转化</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>今日-14.85%，可能是获利回吐或Neutron消息</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>仍亏损，Neutron首飞前估值难以支撑</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>太空基础设施是全新的朱格拉资本投资周期，RKLB是执行最好的纯太空公司之一，但估值已非常高，今日大跌值得关注。</div>
+    <div class="verdict v-watch">👁️ 综合评价：执行力强，积压订单扎实。但今日-14.85%需要确认原因，若无重大负面消息可能是买入机会，若Neutron有问题则需谨慎。</div>
+  </div>
+
+  <!-- ASTS -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#60a5fa">ASTS</div><div class="cname">AST SpaceMobile · Nasdaq</div></div>
+      <div class="cprice"><div class="cpval">$104.69</div><div class="cpchange r">-7.69% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tr">❌深度亏损</span><span class="tag tb">卫星直连手机</span><span class="tag ty">AT&T/T-Mobile入股</span></div>
+    <div class="desc">用低轨卫星直连普通手机，覆盖29亿潜在用户。AT&T/T-Mobile/Verizon三大运营商联合入股，3900项专利护城河。Q1收入$1474万，季度亏损$1.91亿，手握$35亿现金。</div>
+    <div class="brow"><div class="bdot dg"></div><span>已获FCC批准商业运营，技术护城河深</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>当前收入极低，$104股价大量透支未来</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>分析师共识目标价$82，当前高于目标价27%</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>卫星通信是全新周期，卫星发射成功节点（6月BB8/9/10）是关键催化剂。</div>
+    <div class="verdict v-watch">👁️ 综合评价：最大的"全或无"赌注。卫星网络跑通=颠覆性，执行失败=大幅下跌。适合小仓位。</div>
+  </div>
+
+  <!-- INFQ -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#c084fc">INFQ</div><div class="cname">Infleqtion · NYSE</div></div>
+      <div class="cprice"><div class="cpval">$17.95</div><div class="cpchange g">+10.67% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tr">❌亏损</span><span class="tag tp">量子计算</span><span class="tag tp">量子传感</span><span class="tag tb">国防/导航</span></div>
+    <div class="desc">中性原子量子技术全栈公司，产品涵盖量子时钟（Tiqker）、量子RF传感器、量子计算机。FY26收入指引$4000万，已获美国海军$100万合同。2026年5月获美国商务部$1亿拟议资助。</div>
+    <div class="brow"><div class="bdot dg"></div><span>量子时钟和传感器"已交付量子优势"——有真实收入</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>GPS拒止环境下的量子惯性导航，是西方军队"必需品"</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>全年收入仅$4000万，市值估计数十亿，估值极贵</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>量子计算商业化路径仍不明确，时间线长</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>量子技术是"周期前"阶段(pre-cycle)——大规模资本投资周期尚未真正开始，政府资金是主要驱动。</div>
+    <div class="verdict v-speculative">🔮 综合评价：量子传感/导航方向真实，国防需求真实，但量子计算商业化极早期。是高风险投机，不是价值投资。</div>
+  </div>
+
+  <!-- DRAM -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#4ade80">DRAM</div><div class="cname">Roundhill Memory ETF</div></div>
+      <div class="cprice"><div class="cpval">$68.38</div><div class="cpchange g">+8.20% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tg">ETF分散风险</span><span class="tag tb">HBM/内存</span><span class="tag tg">今日+8.2%</span></div>
+    <div class="desc">覆盖HBM和DRAM内存产业链的ETF，包含SK Hynix/三星/美光等。今日大涨8.2%说明内存超级周期仍在持续。HBM需求随AI算力爆发持续激增，供给紧张预期持续至2027年。</div>
+    <div class="brow"><div class="bdot dg"></div><span>HBM供应商SK Hynix今年持续抢购EUV设备</span></div>
+    <div class="brow"><div class="bdot dg"></div><span>ETF形式分散单股风险</span></div>
+    <div class="brow"><div class="bdot dy"></div><span>内存价格周期性强，易受需求变化影响</span></div>
+    <div class="juglar-box"><b>朱格拉位置：</b>内存超级周期中期，HBM是AI算力的"必需品"，当前资本支出周期预计持续到2027-2028年。</div>
+    <div class="verdict v-strong">✅ 综合评价：分散AI内存风险的好方式，比押单股风险低。今日+8.2%是对的方向。</div>
+  </div>
+
+</div>
+
+<!-- SECTOR 4: 其他 -->
+<div class="section-title">⚫ 第四组：其他标的</div>
+<div class="grid">
+
+  <!-- SHSNF -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#f87171">SHSNF</div><div class="cname">顺新科技 · OTC (台湾:6451) · 富士康旗下</div></div>
+      <div class="cprice"><div class="cpval">$14.09</div><div class="cpchange r">-22.36% 今日 🚨</div></div>
+    </div>
+    <div class="tags"><span class="tag tr">今日-22.36%</span><span class="tag ty">SiP封装测试</span><span class="tag tb">富士康子公司</span></div>
+    <div class="desc">SiP（系统封装）产品封装测试，涵盖无线通信模块、光学收发器、MEMS传感器。富士康旗下子公司，主要服务消费电子客户。FY2025营收同比+45%但净利润率仅0.4%。</div>
+    <div class="brow"><div class="bdot dr"></div><span>今日-22%是异常信号，需要立刻搞清楚原因</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>净利率极低（0.4%），业绩一旦低预期就暴跌</span></div>
+    <div class="brow"><div class="bdot dy"></div><span>业务偏消费电子，AI属性弱于其他标的</span></div>
+    <div class="verdict v-caution">🚨 综合评价：今日-22%是红色警报。建议立刻查明原因——是财报miss还是公司新闻？在搞清楚前不建议加仓。</div>
+  </div>
+
+  <!-- HOOD -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#fbbf24">HOOD</div><div class="cname">Robinhood Markets · Nasdaq</div></div>
+      <div class="cprice"><div class="cpval">$90.24</div><div class="cpchange r">-4.31% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tg">✅已盈利</span><span class="tag ty">零售券商</span><span class="tag tb">加密/AI交易</span></div>
+    <div class="desc">零售投资平台，近年持续扩张（加密、期权、退休账户）。与你的watchlist AI主题相关性较低，更多是"散户交易活跃度"的代理指标。$90已是历史高位区域。</div>
+    <div class="brow"><div class="bdot dg"></div><span>已稳定盈利，产品线持续扩张</span></div>
+    <div class="brow"><div class="bdot dr"></div><span>与AI基础设施主线关联性弱</span></div>
+    <div class="verdict v-watch">👁️ 综合评价：好公司，但与你的AI供应链投资逻辑不在一个赛道。</div>
+  </div>
+
+  <!-- NOW -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#4ade80">NOW</div><div class="cname">ServiceNow · NYSE</div></div>
+      <div class="cprice"><div class="cpval">$131.99</div><div class="cpchange g">+6.13% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tg">✅盈利</span><span class="tag tg">企业AI平台</span><span class="tag tg">低风险</span></div>
+    <div class="desc">企业AI工作流平台，AI Agent落地最好的SaaS公司之一。订阅模式收入稳定，AI工具正在成为企业标配，市值约$1500亿。是watchlist里最"稳健"的AI标的。</div>
+    <div class="brow"><div class="bdot dg"></div><span>ARR增长强劲，AI企业工作流渗透率持续提升</span></div>
+    <div class="brow"><div class="bdot dy"></div><span>估值偏贵，但有稳定现金流支撑</span></div>
+    <div class="verdict v-strong">✅ 综合评价：watchlist里风险最低、最稳健的AI软件标的。适合作为组合"压舱石"。</div>
+  </div>
+
+  <!-- QQQ -->
+  <div class="card">
+    <div class="card-top">
+      <div><div class="cticker" style="color:#aaa">QQQ</div><div class="cname">Invesco QQQ Trust · Nasdaq</div></div>
+      <div class="cprice"><div class="cpval">$740.28</div><div class="cpchange g">+0.27% 今日</div></div>
+    </div>
+    <div class="tags"><span class="tag tg">ETF</span><span class="tag tg">纳斯达克100</span><span class="tag tg">低风险基准</span></div>
+    <div class="desc">纳斯达克100 ETF，包含苹果/微软/英伟达/Alphabet等科技巨头。是你整个watchlist的基准对比线——如果你的个股组合长期跑不赢QQQ，那还不如直接买QQQ。</div>
+    <div class="verdict v-strong">✅ 综合评价：基准线。你的选股如果长期跑赢它才有意义。</div>
+  </div>
+
+</div>
+
+<!-- FINAL INSIGHT -->
+<div style="background:#111119;border:1px solid #222230;border-radius:12px;padding:20px;margin-top:8px">
+  <div style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:14px">💡 对整个Watchlist的总体观察</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:0.82rem;color:#bbb;line-height:1.8">
+    <div>
+      <div style="color:#4ade80;font-weight:600;margin-bottom:8px">✅ 逻辑清晰、值得长期关注</div>
+      BB — Physical AI OS，最扎实<br>
+      NOK — AI光网络，已盈利在加速<br>
+      NOW — 企业AI，压舱石<br>
+      DRAM — HBM超级周期ETF<br>
+      VPG — 机器人传感，低调潜力股<br>
+      RKLB — 太空基建，执行力强（需查今日-14%原因）
+    </div>
+    <div>
+      <div style="color:#f87171;font-weight:600;margin-bottom:8px">⚠️ 需要谨慎或等待时机</div>
+      SIVEF — 对的故事，+2100%后估值极度透支<br>
+      AAOI — 今日+17%后追高风险大<br>
+      NVTS — 收入太小、估值太贵，等2027<br>
+      SHSNF — 今日-22%红色警报，先搞清楚原因<br>
+      ASTS — 全或无，等卫星发射验证<br>
+      INFQ — 量子投机，极早期
+    </div>
+  </div>
+  <div style="margin-top:14px;padding:12px;background:#0a0a15;border-radius:8px;font-size:0.8rem;color:#888">
+    <b style="color:#fff">朱格拉周期总结：</b> 你的watchlist整体布局在AI资本投资周期的扩张期，方向正确。但需要区分"已经进入收入确认期"的标的（NOK/BB/BE/RKLB）和"还在等待量产"的标的（SIVEF/NVTS/ASTS）。$5万有限资金，建议重仓前者，小仓位参与后者。
+  </div>
+</div>
+
+</div>
+
+<footer>数据来源：各公司财报、SEC文件、公开新闻 · 2026年6月2日 · 不构成投资建议</footer>
+</body>
+</html>

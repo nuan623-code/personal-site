@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 产品知识库</title>
+<meta name="description" content="Claude 全线产品知识库：模型规格、API、定价、竞品对比，含 Token 预算估算器与 Claude Code 指令生成器。">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Knowledge Hub · 产品知识库</div>
+    <h1>Claude 产品<span class="accent">知识库</span></h1>
+    <p class="lede">从产品文档到分层架构，再到可交互的成本工具——一站式入口。文档可下载分享，数据可搜索，工具可实时计算。</p>
+    <div class="meta-bar" id="meta-bar"></div>
+
+    <!-- 全站搜索 -->
+    <div class="searchbar">
+      <span class="si">🔍</span>
+      <input type="text" id="search-input" placeholder="搜索：缓存、限流、工具调用、套餐、Claude Code 省 token……">
+      <button class="clr" id="search-clear">✕</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </header>
+
+  <div class="toptabs">
+    <button class="toptab active" data-v="dashboard">📈 可视化总览</button>
+    <button class="toptab" data-v="home">全部产出</button>
+    <button class="toptab" data-v="reference">📊 参考数据</button>
+    <button class="toptab" data-v="estimator">🧮 Token 估算器</button>
+    <button class="toptab" data-v="ccprompt">⌨️ Claude Code 指令生成器</button>
+  </div>
+
+  <div class="view active" id="view-dashboard"></div>
+  <div class="view" id="view-home"></div>
+  <div class="view" id="view-reference"></div>
+  <div class="view" id="view-estimator"><div class="tool-host" id="estimator-host"></div></div>
+  <div class="view" id="view-ccprompt"><div class="tool-host" id="ccprompt-host"></div></div>
+
+  <div class="foot">
+    数据时点 <b id="foot-date"></b> · 旗舰 <b id="foot-flagship"></b> · 文档数据来自官方文档与第三方基准，工具计算基于官方定价与最佳实践建模。多项功能为 beta 且更新频繁，决策前请以官方文档为准。本知识库供学习与内部参考。
+  </div>
+</div>
+
+<!-- 数据与脚本：顺序不能变 -->
+<script src="assets/data.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/tools.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  document.getElementById('foot-date').textContent = DATA.meta.dataDate;
+  document.getElementById('foot-flagship').textContent = DATA.meta.flagship;
+  document.title = DATA.meta.siteTitle;
+</script>
+</body>
+</html>
