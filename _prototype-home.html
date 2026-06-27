@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>鸣宇 Mingyu — 个人网站（原型 D）</title>
+<style>
+  :root{
+    --blue-50:#eff5ff; --blue-100:#dbe8ff; --blue-200:#bcd4ff;
+    --blue-500:#3b7df6; --blue-600:#2563eb; --blue-700:#1d4ed8;
+    --blue-grad:linear-gradient(135deg,#2563eb 0%,#1e40af 100%);
+    --ink:#0f1f3d; --text:#2b3a55; --muted:#64748b;
+    --bg:#fff; --surface:#f6f9ff; --surface-2:#eef4ff; --border:#e2e9f5;
+    --font-sans:"Inter","PingFang SC",-apple-system,"Helvetica Neue",system-ui,sans-serif;
+    --font-mono:"JetBrains Mono","Fira Code",monospace;
+    --radius:10px; --radius-lg:18px; --radius-pill:999px;
+    --shadow-sm:0 1px 3px rgba(15,31,61,.06);
+    --shadow:0 8px 28px -10px rgba(15,31,61,.16);
+    --shadow-blue:0 14px 36px -12px rgba(37,99,235,.40);
+    --nav-h:64px; --max:1080px; --gap:24px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:var(--blue-600);text-decoration:none;transition:color .15s}
+  a:hover{color:var(--blue-700)}
+  ::selection{background:var(--blue-200);color:var(--ink)}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:100;height:var(--nav-h);background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--border)}
+  .nav-inner{max-width:var(--max);margin:0 auto;padding:0 var(--gap);height:100%;display:flex;align-items:center;justify-content:space-between}
+  .nav-logo{font-weight:700;font-size:1.1rem;color:var(--ink);letter-spacing:-.02em}
+  .nav-logo::after{content:".";color:var(--blue-600)}
+  .nav-links{display:flex;gap:2px;list-style:none}
+  .nav-links a{padding:7px 13px;border-radius:var(--radius-pill);font-size:.88rem;font-weight:500;color:var(--muted);transition:.15s}
+  .nav-links a:hover{background:var(--surface);color:var(--ink)}
+  .nav-links a.active{background:var(--blue-50);color:var(--blue-700);font-weight:600}
+
+  /* hero */
+  .hero{position:relative;text-align:center;padding:84px 24px 64px;overflow:hidden;
+    background:radial-gradient(58% 70% at 50% -8%,rgba(37,99,235,.12),transparent 62%),linear-gradient(180deg,var(--blue-50) 0%,#fff 78%)}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(rgba(37,99,235,.10) 1px,transparent 1px);background-size:22px 22px;
+    -webkit-mask-image:radial-gradient(60% 55% at 50% 8%,#000,transparent 70%);mask-image:radial-gradient(60% 55% at 50% 8%,#000,transparent 70%)}
+  .hero::after{content:"";position:absolute;width:420px;height:420px;right:-140px;top:-180px;border-radius:50%;
+    background:radial-gradient(circle,rgba(59,125,246,.18),transparent 65%);pointer-events:none}
+  .hero>*{position:relative;z-index:1}
+  .status{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);
+    border-radius:var(--radius-pill);padding:6px 14px;font-size:.8rem;font-weight:500;color:var(--text);box-shadow:var(--shadow-sm);margin-bottom:24px}
+  .status .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.18)}
+  .avatar{width:92px;height:92px;border-radius:50%;margin:0 auto 22px;display:flex;align-items:center;justify-content:center;
+    background:var(--blue-grad);color:#fff;font-size:2.2rem;font-weight:700;border:4px solid #fff;box-shadow:var(--shadow-blue)}
+  .hero h1{font-size:clamp(2.3rem,5vw,3.3rem);font-weight:700;letter-spacing:-.03em;line-height:1.14;color:var(--ink)}
+  .hero h1 .accent{background:var(--blue-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero .lead{margin:18px auto 0;font-size:1.15rem;color:var(--muted);max-width:548px}
+  .tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:24px}
+  .tag{font-size:.82rem;font-weight:500;padding:6px 14px;border-radius:var(--radius-pill);background:#fff;border:1px solid var(--border);color:var(--text)}
+  .cta-row{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--radius-pill);font-size:.95rem;font-weight:600;
+    transition:transform .15s,box-shadow .15s,background .15s;cursor:pointer;border:1px solid transparent}
+  .btn-primary{background:var(--blue-grad);color:#fff;box-shadow:var(--shadow-blue)}
+  .btn-primary:hover{color:#fff;transform:translateY(-2px);box-shadow:0 18px 40px -10px rgba(37,99,235,.5)}
+  .btn-secondary{background:#fff;color:var(--blue-700);border-color:var(--blue-200)}
+  .btn-secondary:hover{background:var(--blue-50);transform:translateY(-2px)}
+
+  .wrap{max-width:var(--max);margin:0 auto;padding:8px var(--gap) 80px}
+
+  .section-head{margin:62px 0 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+  .section-head .eyebrow{display:inline-block;font-size:.76rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-600);margin-bottom:6px}
+  .section-head h2{font-size:1.4rem;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+  .section-head .more{font-size:.85rem;font-weight:600;color:var(--muted);white-space:nowrap}
+  .section-head .more:hover{color:var(--blue-600)}
+
+  /* weighted grid */
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--gap)}
+  .card{position:relative;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;
+    transition:box-shadow .22s,transform .22s,border-color .22s;display:flex;flex-direction:column;color:var(--text);overflow:hidden}
+  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--blue-grad);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+  .card:hover{box-shadow:var(--shadow-blue);transform:translateY(-4px);border-color:var(--blue-200)}
+  .card:hover::before{transform:scaleX(1)}
+  .card .icon{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:var(--blue-50);font-size:1.5rem;margin-bottom:16px}
+  .card h3{font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
+  .card p{font-size:.92rem;color:var(--muted);line-height:1.65}
+  .card .arrow{margin-top:auto;padding-top:14px;font-size:.85rem;font-weight:600;color:var(--blue-600);display:inline-flex;align-items:center;gap:4px}
+  .card:hover .arrow{gap:8px}
+  .card.span-3{grid-column:span 3}
+  .card.span-2{grid-column:span 2}
+  /* featured */
+  .card.feature{grid-column:span 3;background:linear-gradient(180deg,var(--surface) 0%,#fff 60%)}
+  .card.feature .icon{background:#fff;box-shadow:var(--shadow-sm)}
+  .feature .mini{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+  .feature .mini a{display:flex;justify-content:space-between;gap:12px;font-size:.86rem;color:var(--text);padding:7px 0;border-top:1px dashed var(--border)}
+  .feature .mini a:hover{color:var(--blue-700)}
+  .feature .mini .d{color:var(--muted);font-size:.78rem;white-space:nowrap}
+
+  /* writing list */
+  .posts{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .posts li a{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:16px 20px;background:var(--bg);
+    border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius);color:var(--text);transition:box-shadow .15s,border-color .15s,transform .15s}
+  .posts li a:hover{box-shadow:var(--shadow);border-left-color:var(--blue-600);transform:translateX(2px)}
+  .posts .t{font-size:.96rem;font-weight:500;color:var(--ink)}
+  .posts .meta{font-size:.8rem;color:var(--muted);white-space:nowrap}
+
+  footer{background:var(--ink);color:#aab8d4;text-align:center;padding:48px var(--gap);font-size:.9rem;margin-top:64px}
+  footer a{color:#cdd9f3}
+  footer a:hover{color:#fff}
+  .footer-links{display:flex;gap:22px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+  .footer-links a{font-weight:500}
+  .footer-copy{color:#7d8db0;font-size:.82rem}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:760px){
+    .nav-links{display:none}
+    .grid{grid-template-columns:1fr}
+    .card.span-3,.card.span-2,.card.feature{grid-column:span 1}
+    .section-head{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">鸣宇</a>
+    <ul class="nav-links">
+      <li><a href="#" class="active">首页</a></li>
+      <li><a href="#">AI 笔记</a></li>
+      <li><a href="#">出海研习社</a></li>
+      <li><a href="#">SaaS 成长</a></li>
+      <li><a href="#">项目</a></li>
+      <li><a href="#">公众号</a></li>
+    </ul>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="status"><span class="dot"></span>现在在做 · 出海工具箱 &amp; 用 Claude Code 写小游戏</div>
+  <div class="avatar">鸣</div>
+  <h1>你好，我是<span class="accent">鸣宇</span> 👋</h1>
+  <p class="lead">记录 AI 探索、出海实践与 SaaS 职业成长，偶尔折腾点好玩的小项目。</p>
+  <div class="tag-row">
+    <span class="tag">AI / Agent</span>
+    <span class="tag">出海增长</span>
+    <span class="tag">广告变现</span>
+    <span class="tag">SaaS / Sales Engineer</span>
+    <span class="tag">独立项目</span>
+  </div>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="#">看我的项目 →</a>
+    <a class="btn btn-secondary" href="#">联系我</a>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <div class="section-head reveal">
+    <div>
+      <span class="eyebrow">Explore</span>
+      <h2>逛逛这些板块</h2>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card feature reveal">
+      <div class="icon">🤖</div>
+      <h3>AI 学习笔记</h3>
+      <p>Agent、Cursor、Claude、OpenAI 及自动化工具的使用与实践记录。</p>
+      <div class="mini">
+        <a href="#"><span>Stanford CS146S 第一周笔记</span><span class="d">06</span></a>
+        <a href="#"><span>大语言模型完全指南</span><span class="d">06</span></a>
+        <a href="#"><span>Claude 开发者层完整手册</span><span class="d">06</span></a>
+      </div>
+      <a class="arrow" href="#">进入板块 →</a>
+    </div>
+
+    <a class="card span-3 reveal" href="#">
+      <div class="icon">🌏</div>
+      <h3>出海研习社</h3>
+      <p>广告投放、MMP、SKAN、移动变现，出海从业者的经验沉淀。</p>
+      <span class="arrow">查看 →</span>
+    </a>
+
+    <a class="card span-2 reveal" href="#">
+      <div class="icon">📈</div>
+      <h3>SaaS 职业成长</h3>
+      <p>SC / Sales Engineer 成长路径、管理经验与职场思考。</p>
+      <span class="arrow">查看 →</span>
+    </a>
+
+    <a class="card span-2 reveal" href="#">
+      <div class="icon">✍️</div>
+      <h3>公众号文章归档</h3>
+      <p>已发布公众号文章的网页版存档，方便搜索与回顾。</p>
+      <span class="arrow">查看 →</span>
+    </a>
+
+    <a class="card span-2 reveal" href="#">
+      <div class="icon">🎯</div>
+      <h3>个人项目</h3>
+      <p>出海工具箱、小游戏、Etsy 相关项目，一些好玩的东西。</p>
+      <span class="arrow">查看 →</span>
+    </a>
+  </div>
+
+  <div class="section-head reveal">
+    <div>
+      <span class="eyebrow">Writing</span>
+      <h2>最近写的</h2>
+    </div>
+    <a class="more" href="#">全部文章 →</a>
+  </div>
+
+  <ul class="posts">
+    <li class="reveal"><a href="#"><span class="t">Stanford CS146S 第一周笔记 · 编码 LLM 入门</span><span class="meta">AI 笔记 · 2026-06</span></a></li>
+    <li class="reveal"><a href="#"><span class="t">大语言模型完全指南 · 从训练流水线到提示工程</span><span class="meta">AI 笔记 · 2026-06</span></a></li>
+    <li class="reveal"><a href="#"><span class="t">Claude 开发者层完整手册</span><span class="meta">AI 笔记 · 2026-06</span></a></li>
+  </ul>
+
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="#">📧 Email</a>
+    <a href="#">✍️ 公众号</a>
+    <a href="#">🎯 项目</a>
+  </div>
+  <p class="footer-copy">© 2025 鸣宇 Mingyu · mingyuyang.com</p>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{rootMargin:'-40px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
