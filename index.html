@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>鸣宇 Mingyu — 个人网站</title>
-  <meta name="description" content="鸣宇的个人网站，分享 AI 学习、出海经验、SaaS 职业成长与个人项目。" />
+  <title>Mingyu Yang — 记录学习，分享实践</title>
+  <meta name="description" content="杨鸣宇的个人知识库，记录 AI、移动广告、软件开发的学习与实践。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body>
@@ -13,50 +16,120 @@
 
   <div class="page-wrapper">
 
-    <!-- Hero -->
-    <section class="hero">
-      <h1>你好，我是鸣宇 👋</h1>
-      <p>记录 AI 探索、出海实践与 SaaS 职业成长，偶尔折腾小项目。</p>
-    </section>
+    <!-- Intro -->
+    <div class="home-intro reveal">
+      <h1>杨鸣宇</h1>
+      <p>记录学习，分享实践，持续更新。</p>
+    </div>
 
-    <!-- 板块入口 -->
-    <div class="section-grid">
+    <!-- Dashboard -->
+    <div class="home-grid">
 
-      <a class="section-card" href="/ai-notes/index.html">
-        <div class="icon">🤖</div>
-        <h2>AI 学习笔记</h2>
-        <p>Agent、Cursor、Claude、OpenAI 及自动化工具的使用与实践记录。</p>
-      </a>
+      <!-- Main column -->
+      <div class="home-main">
 
-      <a class="section-card" href="/overseas/index.html">
-        <div class="icon">🌏</div>
-        <h2>出海研习社</h2>
-        <p>广告投放、MMP、SKAN、移动变现，出海从业者的经验沉淀。</p>
-      </a>
+        <!-- 最近更新 -->
+        <div class="home-block reveal">
+          <div class="section-label">
+            <h2>最近更新</h2>
+            <a href="/articles/index.html">查看全部 &rarr;</a>
+          </div>
+          <ul class="article-list">
+            <li>
+              <a href="/ai-notes/skan-4-attribution.html">
+                <div class="article-title">SKAN 4.0 归因机制阅读笔记</div>
+                <div class="article-meta">
+                  <span class="article-tag">移动广告</span>
+                  <span>2026-06-18</span>
+                  <span>12 分钟阅读</span>
+                </div>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:6px;line-height:1.6">整理 SKAN 4.0 在多 postback、coarse value、source identifier 上的关键变化，以及对归因平台数据接入的实际影响。</p>
+              </a>
+            </li>
+            <li>
+              <a href="/ai-notes/mcp-server-practice.html">
+                <div class="article-title">MCP Server 的一次实践与设计取舍</div>
+                <div class="article-meta">
+                  <span class="article-tag">AI</span>
+                  <span>2026-06-10</span>
+                  <span>9 分钟阅读</span>
+                </div>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:6px;line-height:1.6">从一个内部工具的需求出发，记录把现有服务封装为 MCP server 的过程，以及 tool / resource / prompt 三者的选择思路。</p>
+              </a>
+            </li>
+            <li>
+              <a href="/ai-notes/prompt-checklist.html">
+                <div class="article-title">我自己常用的 Prompt 检查清单</div>
+                <div class="article-meta">
+                  <span class="article-tag">Prompt Engineering</span>
+                  <span>2026-05-29</span>
+                  <span>7 分钟阅读</span>
+                </div>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:6px;line-height:1.6">不是方法论文章，只是把过去半年实际有效的 prompt 习惯整理成一张可以反复 review 的清单。</p>
+              </a>
+            </li>
+            <li>
+              <a href="/overseas/geo-content-strategy.html">
+                <div class="article-title">GEO（生成式引擎优化）的内容策略观察</div>
+                <div class="article-meta">
+                  <span class="article-tag">GEO</span>
+                  <span>2026-05-12</span>
+                  <span>11 分钟阅读</span>
+                </div>
+                <p style="font-size:.875rem;color:var(--muted);margin-top:6px;line-height:1.6">在 LLM 主导的搜索路径下，内容如何被引用与重写。结合几个公开案例做一次梳理。</p>
+              </a>
+            </li>
+          </ul>
+        </div>
 
-      <a class="section-card" href="/saas-career/index.html">
-        <div class="icon">📈</div>
-        <h2>SaaS 职业成长</h2>
-        <p>SC / Sales Engineer 成长路径、管理经验与职场思考分享。</p>
-      </a>
+      </div>
 
-      <a class="section-card" href="/wechat-archive/index.html">
-        <div class="icon">✍️</div>
-        <h2>公众号文章归档</h2>
-        <p>已发布公众号文章的网页版存档，方便搜索与回顾。</p>
-      </a>
+      <!-- Side column -->
+      <div class="home-side">
 
-      <a class="section-card" href="/projects/index.html">
-        <div class="icon">🎯</div>
-        <h2>个人项目</h2>
-        <p>出海工具箱、小游戏、Etsy 相关项目，一些好玩的东西。</p>
-      </a>
+        <!-- 最近学习 -->
+        <div class="home-block reveal">
+          <div class="section-label">
+            <h2>最近学习</h2>
+            <a href="/ai-notes/index.html">查看全部 &rarr;</a>
+          </div>
+          <ul class="side-list">
+            <li><a href="/ai-notes/claude-code-notes.html"><span>Claude Code 使用笔记</span><span class="side-date">06-25</span></a></li>
+            <li><a href="/ai-notes/cs146s-notes.html"><span>CS146S 学习笔记</span><span class="side-date">06-24</span></a></li>
+            <li><a href="/ai-notes/skan-4-attribution.html"><span>SKAN 4.0 / SKAdNetwork</span><span class="side-date">06-22</span></a></li>
+            <li><a href="#"><span>Lovable 开发记录</span><span class="side-date">06-22</span></a></li>
+            <li><a href="#"><span>React 深入阅读</span><span class="side-date">06-20</span></a></li>
+            <li><a href="#"><span>Model Context Protocol</span><span class="side-date">06-18</span></a></li>
+            <li><a href="#"><span>Prompt Engineering</span><span class="side-date">06-14</span></a></li>
+            <li><a href="#"><span>Next.js App Router 实践</span><span class="side-date">06-12</span></a></li>
+          </ul>
+        </div>
 
+        <!-- 最近项目 -->
+        <div class="home-block reveal">
+          <div class="section-label">
+            <h2>最近项目</h2>
+            <a href="/projects/index.html">查看全部 &rarr;</a>
+          </div>
+          <ul class="side-list">
+            <li><a href="/projects/index.html"><span>ZippyArcade — 网页游戏站</span><span class="side-date">进行中</span></a></li>
+            <li><a href="/projects/wechat-md/"><span>微信 MD 排版工具</span><span class="side-date">进行中</span></a></li>
+            <li><a href="#"><span>AI Prompt Library</span><span class="side-date">规划中</span></a></li>
+          </ul>
+        </div>
+
+      </div>
     </div>
   </div>
 
   <footer>
-    <p>© 2025 鸣宇 Mingyu · <a href="https://mingyuyang.com">mingyuyang.com</a></p>
+    <div class="footer-inner">
+      <span>Mingyu Yang &copy; 2026</span>
+      <div class="footer-links">
+        <a href="https://github.com/nuan623-code" target="_blank" rel="noopener">GitHub</a>
+        <a href="/about.html">关于</a>
+      </div>
+    </div>
   </footer>
 
   <script src="/assets/nav.js"></script>
