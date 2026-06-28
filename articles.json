@@ -1,5 +1,12 @@
 [
   {
+    "title": "提示工程技术全览 · Prompting Techniques",
+    "short_title": "提示工程技术全览 · Prompting Techniques",
+    "url": "/ai-notes/prompting-techniques-guide.html",
+    "tag": "AI",
+    "type": "article"
+  },
+  {
     "title": "DSpark 论文精读 · 置信度调度的半自回归推测解码",
     "short_title": "DSpark 论文精读 · 置信度调度的半自回归推测解码",
     "url": "/ai-notes/dspark-paper-guide.html",
