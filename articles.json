@@ -1,5 +1,12 @@
 [
   {
+    "title": "DSpark 论文精读 · 置信度调度的半自回归推测解码",
+    "short_title": "DSpark 论文精读 · 置信度调度的半自回归推测解码",
+    "url": "/ai-notes/dspark-paper-guide.html",
+    "tag": "AI",
+    "type": "article"
+  },
+  {
     "title": "DeepSeek-R1:用强化学习激发大模型的推理能力",
     "short_title": "DeepSeek-R1:用强化学习激发大模型的推理能力",
     "url": "/ai-notes/deepseek-r1-guide.html",
